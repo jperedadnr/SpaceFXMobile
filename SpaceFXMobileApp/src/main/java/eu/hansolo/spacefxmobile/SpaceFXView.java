@@ -1,13 +1,11 @@
 package eu.hansolo.spacefxmobile;
 
-import com.gluonhq.charm.glisten.control.AppBar;
-import com.gluonhq.charm.glisten.mvc.View;
-import com.gluonhq.charm.glisten.visual.MaterialDesignIcon;
 import javafx.animation.AnimationTimer;
 import javafx.animation.PauseTransition;
 import javafx.event.EventHandler;
 import javafx.event.EventType;
 import javafx.geometry.Insets;
+import javafx.geometry.Rectangle2D;
 import javafx.geometry.VPos;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
@@ -16,6 +14,7 @@ import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.GridPane;
@@ -24,11 +23,10 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.RowConstraints;
 import javafx.scene.layout.StackPane;
-import javafx.scene.media.MediaPlayer;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
-import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
+import javafx.stage.Screen;
 import javafx.util.Duration;
 
 import java.util.ArrayList;
@@ -36,7 +34,10 @@ import java.util.List;
 import java.util.Random;
 
 
-public class SpaceFXView extends View {
+public class SpaceFXView extends BorderPane {
+
+    private static final Rectangle2D BOUNDS = Screen.getPrimary().getVisualBounds();
+
     //----------- Switches to switch on/off different features ----------------
     private static final boolean                  SHOW_BACKGROUND            = true;
     private static final boolean                  SHOW_STARS                 = true;
@@ -58,8 +59,12 @@ public class SpaceFXView extends View {
     private static final long                     ENEMY_BOSS_ATTACK_INTERVAL = 20_000_000_000l;
     private static final long                     CRYSTAL_SPAWN_INTERVAL     = 25_000_000_000l;
     private static final Random                   RND                        = new Random();
-    private static final double                   WIDTH                      = 700;
-    private static final double                   HEIGHT                     = 900;
+    private static final double                   CONTROLS_HEIGHT = BOUNDS.getHeight() / 4;
+    private static final double                   CONTROLS_SIZE = CONTROLS_HEIGHT / 4;
+    private static final double                   CONTROLS_PADDING = CONTROLS_HEIGHT / 10;
+    private static final double                   WIDTH                      = BOUNDS.getWidth();
+    private static final double                   HEIGHT                     = BOUNDS.getHeight() - CONTROLS_HEIGHT;
+
     private static final double                   FIRST_QUARTER_WIDTH        = WIDTH * 0.25;
     private static final double                   LAST_QUARTER_WIDTH         = WIDTH * 0.75;
     private static final double                   SHIELD_INDICATOR_X         = WIDTH * 0.73;
@@ -80,7 +85,7 @@ public class SpaceFXView extends View {
     private              boolean                  gameOverScreen;
     private final        Image                    startImg                   = new Image(getClass().getResourceAsStream("startscreen.png"));
     private final        Image                    gameOverImg                = new Image(getClass().getResourceAsStream("gameover.png"));
-    private final        Image                    backgroundImg              = new Image(SpaceFX.class.getResourceAsStream("background.jpg"));
+    private final        Image                    backgroundImg              = new Image(SpaceFX.class.getResourceAsStream("background.png"));
     private final        Image[]                  asteroidImages             = { new Image(getClass().getResourceAsStream("asteroid1.png"), 140, 140, true, false),
                                                                                  new Image(getClass().getResourceAsStream("asteroid2.png"), 140, 140, true, false),
                                                                                  new Image(getClass().getResourceAsStream("asteroid3.png"), 140, 140, true, false),
@@ -118,13 +123,13 @@ public class SpaceFXView extends View {
     private final        Image                    crystalExplosionImg        = new Image(getClass().getResourceAsStream("crystalExplosion.png"), 400, 700, true, false);
     private final        Image                    rocketImg                  = new Image(getClass().getResourceAsStream("rocket.png"), 17, 50, true, false);
     private final        Image                    rocketExplosionImg         = new Image(getClass().getResourceAsStream("rocketExplosion.png"), 512, 896, true, false);
-    private final        Image                    topKeyImg               = new Image(getClass().getResourceAsStream("topKey.png"), 64, 64, true, false);
-    private final        Image                    rightKeyImg             = new Image(getClass().getResourceAsStream("rightKey.png"), 64, 64, true, false);
-    private final        Image                    bottomKeyImg            = new Image(getClass().getResourceAsStream("bottomKey.png"), 64, 64, true, false);
-    private final        Image                    leftKeyImg              = new Image(getClass().getResourceAsStream("leftKey.png"), 64, 64, true, false);
-    private final        Image                    spaceKeyImg             = new Image(getClass().getResourceAsStream("spaceKey.png"), 204, 64, true, false);
-    private final        Image                    sKeyImg                 = new Image(getClass().getResourceAsStream("sKey.png"), 64, 64, true, false);
-    private final        Image                    rKeyImg                 = new Image(getClass().getResourceAsStream("rKey.png"), 64, 64, true, false);
+    private final        Image                    topKeyImg               = new Image(getClass().getResourceAsStream("topKey.png"), CONTROLS_SIZE, CONTROLS_SIZE, true, false);
+    private final        Image                    rightKeyImg             = new Image(getClass().getResourceAsStream("rightKey.png"), CONTROLS_SIZE, CONTROLS_SIZE, true, false);
+    private final        Image                    bottomKeyImg            = new Image(getClass().getResourceAsStream("bottomKey.png"), CONTROLS_SIZE, CONTROLS_SIZE, true, false);
+    private final        Image                    leftKeyImg              = new Image(getClass().getResourceAsStream("leftKey.png"), CONTROLS_SIZE, CONTROLS_SIZE, true, false);
+    private final        Image                    spaceKeyImg             = new Image(getClass().getResourceAsStream("spaceKey.png"), 204, CONTROLS_SIZE, true, false);
+    private final        Image                    sKeyImg                 = new Image(getClass().getResourceAsStream("sKey.png"), CONTROLS_SIZE, CONTROLS_SIZE, true, false);
+    private final        Image                    rKeyImg                 = new Image(getClass().getResourceAsStream("rKey.png"), CONTROLS_SIZE, CONTROLS_SIZE, true, false);
     private final        double                   deflectorShieldRadius   = deflectorShieldImg.getRequestedWidth() * 0.5;
     private              Font                     scoreFont;
     private              double                   backgroundViewportY;
@@ -195,34 +200,34 @@ public class SpaceFXView extends View {
         pane.setBackground(new Background(new BackgroundFill(Color.BLACK, CornerRadii.EMPTY, Insets.EMPTY)));
 
         GridPane leftGrid = new GridPane();
-        leftGrid.getColumnConstraints().add(new ColumnConstraints(64));
-        leftGrid.getColumnConstraints().add(new ColumnConstraints(64));
-        leftGrid.getColumnConstraints().add(new ColumnConstraints(64));
-        leftGrid.getRowConstraints().add(new RowConstraints(64));
-        leftGrid.getRowConstraints().add(new RowConstraints(64));
-        leftGrid.getRowConstraints().add(new RowConstraints(64));
+        leftGrid.getColumnConstraints().add(new ColumnConstraints(CONTROLS_SIZE));
+        leftGrid.getColumnConstraints().add(new ColumnConstraints(CONTROLS_SIZE));
+        leftGrid.getColumnConstraints().add(new ColumnConstraints(CONTROLS_SIZE));
+        leftGrid.getRowConstraints().add(new RowConstraints(CONTROLS_SIZE));
+        leftGrid.getRowConstraints().add(new RowConstraints(CONTROLS_SIZE));
+        leftGrid.getRowConstraints().add(new RowConstraints(CONTROLS_SIZE));
         leftGrid.add(rKey, 0, 0);
         leftGrid.add(sKey, 2, 0);
         leftGrid.add(spaceKey, 0, 2);
-        leftGrid.setPadding(new Insets(0, 0, 0, 20));
+        leftGrid.setPadding(new Insets(0, 0, 0, CONTROLS_PADDING));
         GridPane.setColumnSpan(spaceKey, 3);
 
         GridPane rightGrid = new GridPane();
-        rightGrid.getColumnConstraints().add(new ColumnConstraints(64));
-        rightGrid.getColumnConstraints().add(new ColumnConstraints(64));
-        rightGrid.getColumnConstraints().add(new ColumnConstraints(64));
-        rightGrid.getRowConstraints().add(new RowConstraints(64));
-        rightGrid.getRowConstraints().add(new RowConstraints(64));
-        rightGrid.getRowConstraints().add(new RowConstraints(64));
+        rightGrid.getColumnConstraints().add(new ColumnConstraints(CONTROLS_SIZE));
+        rightGrid.getColumnConstraints().add(new ColumnConstraints(CONTROLS_SIZE));
+        rightGrid.getColumnConstraints().add(new ColumnConstraints(CONTROLS_SIZE));
+        rightGrid.getRowConstraints().add(new RowConstraints(CONTROLS_SIZE));
+        rightGrid.getRowConstraints().add(new RowConstraints(CONTROLS_SIZE));
+        rightGrid.getRowConstraints().add(new RowConstraints(CONTROLS_SIZE));
         rightGrid.add(topKey, 1, 0);
         rightGrid.add(leftKey, 0, 1);
         rightGrid.add(rightKey, 2, 1);
         rightGrid.add(bottomKey, 1, 2);
-        rightGrid.setPadding(new Insets(0, 20, 0, 0));
+        rightGrid.setPadding(new Insets(0, CONTROLS_PADDING, 0, 0));
 
         Region spacer = new Region();
         HBox buttonPane = new HBox(0, leftGrid, spacer, rightGrid);
-        buttonPane.setPadding(new Insets(30, 0, 0, 0));
+        buttonPane.setPadding(new Insets(CONTROLS_PADDING, 0, 0, 0));
         buttonPane.setBackground(new Background(new BackgroundFill(Color.BLACK, CornerRadii.EMPTY, Insets.EMPTY)));
         HBox.setHgrow(spacer, Priority.ALWAYS);
 
@@ -231,13 +236,6 @@ public class SpaceFXView extends View {
         setBackground(new Background(new BackgroundFill(Color.BLACK, CornerRadii.EMPTY, Insets.EMPTY)));
 
     }
-
-    @Override protected void updateAppBar(AppBar appBar) {
-        appBar.setNavIcon(MaterialDesignIcon.MENU.button(e -> System.out.println("Menu")));
-        appBar.setTitleText("SpaceFX Mobile");
-        appBar.getActionItems().add(MaterialDesignIcon.SEARCH.button(e -> System.out.println("Search")));
-    }
-
 
     private void init() {
         scoreFont        = spaceBoy(30);
@@ -335,7 +333,7 @@ public class SpaceFXView extends View {
                     } else if (src.equals(rightKey)) {
                         spaceShip.vX = 5;
                     } else if (src.equals(bottomKey)) {
-                        spaceShip.vY = -5;
+                        spaceShip.vY = 5;
                     } else if (src.equals(leftKey)) {
                         spaceShip.vX = -5;
                     } else if (src.equals(spaceKey)) {
