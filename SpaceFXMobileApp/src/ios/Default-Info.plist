@@ -7,7 +7,7 @@
         <key>CFBundleVersion</key>
         <string>1.0</string>
         <key>CFBundleExecutable</key>
-        <string>SpaceFXMobileApp</string>
+        <string>spacefx</string>
         <key>CFBundleIconName</key>
         <string>AppIcon</string>
         <key>CFBundleName</key>
