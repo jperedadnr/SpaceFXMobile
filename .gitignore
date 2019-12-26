@@ -10,3 +10,4 @@ SpaceFXMobile.iml
 *.class
 /src/main/resources/eu/hansolo/spacefxmobile/beams.png
 /SpaceFXMobileApp/build
+SpaceFXMobileApp/target
